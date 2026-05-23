@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Quantum Voice Signal</title>
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+
+  <meta name="theme-color" content="#050510" />
+</head>
+<body>
+  <div class="app">
+    <h1>Quantum Voice Signal</h1>
+    <p>OTC 1-Minute Voice Alert App</p>
+
+    <div class="signal-card">
+      <h2 id="signal">NO TRADE</h2>
+      <p id="confidence">Confidence: 0%</p>
+      <p id="reason">Waiting for clean setup...</p>
+    </div>
+
+    <div class="buttons">
+      <button onclick="startBot()">Start</button>
+      <button onclick="stopBot()">Stop</button>
+    </div>
+
+    <div class="timer">
+      Next scan: <span id="timer">60</span>s
+    </div>
+
+    <div id="log" class="log"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
