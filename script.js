@@ -2,47 +2,34 @@ let botInterval = null;
 let countdownInterval = null;
 let countdown = 60;
 
-const pairs = [
-  "EUR/USD", "GBP/USD", "USD/JPY", "USD/CHF",
-  "AUD/USD", "USD/CAD", "NZD/USD",
-  "EUR/GBP", "EUR/JPY", "GBP/JPY",
-  "AUD/JPY", "CAD/JPY", "CHF/JPY",
-  "EUR/AUD", "EUR/CAD", "GBP/AUD",
-  "GBP/CAD", "AUD/CAD", "AUD/NZD",
-  "NZD/JPY", "USD/TRY", "USD/BDT",
-  "BTC/USD", "ETH/USD", "XAU/USD"
-];
-
-function loadPairs() {
-  const select = document.getElementById("pairSelect");
-
-  pairs.forEach(pair => {
-    const option = document.createElement("option");
-    option.value = pair;
-    option.textContent = pair;
-    select.appendChild(option);
-  });
-
-  updatePairName();
-}
-
 function getSelectedPair() {
-  const pair = document.getElementById("pairSelect").value;
-  const otc = document.getElementById("otcMode").checked;
+  const pairSelect = document.getElementById("pairSelect");
+  const otcMode = document.getElementById("otcMode");
+
+  const pair = pairSelect ? pairSelect.value : "EUR/USD";
+  const otc = otcMode ? otcMode.checked : true;
 
   return otc ? `${pair} OTC` : pair;
 }
 
 function updatePairName() {
-  document.getElementById("pairName").innerText = getSelectedPair();
+  const pairName = document.getElementById("pairName");
+  if (pairName) {
+    pairName.innerText = getSelectedPair();
+  }
 }
 
 function speak(text) {
-  speechSynthesis.cancel();
+  if (!("speechSynthesis" in window)) return;
+
+  window.speechSynthesis.cancel();
+
   const msg = new SpeechSynthesisUtterance(text);
   msg.lang = "en-US";
   msg.rate = 0.9;
-  speechSynthesis.speak(msg);
+  msg.pitch = 1;
+
+  window.speechSynthesis.speak(msg);
 }
 
 function randomMarketData() {
@@ -113,7 +100,10 @@ function updateUI(result) {
   const confidence = document.getElementById("confidence");
   const reason = document.getElementById("reason");
   const log = document.getElementById("log");
+
   const pair = getSelectedPair();
+
+  if (!signal || !confidence || !reason || !log) return;
 
   signal.className = "";
 
@@ -138,8 +128,10 @@ function updateUI(result) {
 
 function runBot() {
   updatePairName();
+
   const data = randomMarketData();
   const result = calculateSignal(data);
+
   updateUI(result);
   countdown = 60;
 }
@@ -148,11 +140,15 @@ function startTimer() {
   clearInterval(countdownInterval);
 
   countdown = 60;
-  document.getElementById("timer").innerText = countdown;
+
+  const timer = document.getElementById("timer");
+  if (timer) timer.innerText = countdown;
 
   countdownInterval = setInterval(() => {
     countdown--;
-    document.getElementById("timer").innerText = countdown;
+
+    const timer = document.getElementById("timer");
+    if (timer) timer.innerText = countdown;
 
     if (countdown <= 0) {
       countdown = 60;
@@ -163,7 +159,9 @@ function startTimer() {
 function startBot() {
   if (botInterval) return;
 
+  updatePairName();
   speak("Quantum voice signal app started.");
+
   runBot();
 
   botInterval = setInterval(runBot, 60000);
@@ -181,12 +179,20 @@ function stopBot() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  loadPairs();
+  updatePairName();
 
-  document.getElementById("pairSelect").addEventListener("change", updatePairName);
-  document.getElementById("otcMode").addEventListener("change", updatePairName);
+  const pairSelect = document.getElementById("pairSelect");
+  const otcMode = document.getElementById("otcMode");
+
+  if (pairSelect) {
+    pairSelect.addEventListener("change", updatePairName);
+  }
+
+  if (otcMode) {
+    otcMode.addEventListener("change", updatePairName);
+  }
 });
 
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js");
+  navigator.serviceWorker.register("service-worker.js").catch(() => {});
 }
