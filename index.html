@@ -3,29 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>Quantum Voice Signal</title>
-
   <link rel="stylesheet" href="style.css" />
   <link rel="manifest" href="manifest.json" />
-
-  <meta name="theme-color" content="#050510" />
 </head>
 <body>
   <div class="app">
     <h1>Quantum Voice Signal</h1>
-    <p>OTC 1-Minute Voice Alert App</p>
+    <p>QXBroker-style OTC Voice Alert</p>
+
+    <div class="controls">
+      <label>Select Pair</label>
+      <select id="pairSelect"></select>
+
+      <label class="switch">
+        <input type="checkbox" id="otcMode" checked>
+        <span>OTC Mode</span>
+      </label>
+    </div>
 
     <div class="signal-card">
-      <h2 id="signal">NO TRADE</h2>
+      <h2 id="pairName">EUR/USD OTC</h2>
+      <h1 id="signal">NO TRADE</h1>
       <p id="confidence">Confidence: 0%</p>
       <p id="reason">Waiting for clean setup...</p>
     </div>
 
-    <div class="buttons">
-      <button onclick="startBot()">Start</button>
-      <button onclick="stopBot()">Stop</button>
-    </div>
+    <button onclick="startBot()">Start</button>
+    <button onclick="stopBot()">Stop</button>
 
     <div class="timer">
       Next scan: <span id="timer">60</span>s

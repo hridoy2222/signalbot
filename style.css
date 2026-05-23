@@ -7,12 +7,45 @@ body {
 }
 
 .app {
-  padding: 25px;
+  padding: 22px;
 }
 
 h1 {
   color: #00f7ff;
   text-shadow: 0 0 18px #00f7ff;
+}
+
+.controls {
+  margin: 20px auto;
+  max-width: 360px;
+  padding: 18px;
+  background: #101026;
+  border-radius: 16px;
+  box-shadow: 0 0 18px #00f7ff33;
+}
+
+label {
+  display: block;
+  margin: 10px 0;
+  color: #aaa;
+}
+
+select {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  background: #050510;
+  color: #00f7ff;
+  font-size: 16px;
+  outline: none;
+}
+
+.switch {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  color: white;
 }
 
 .signal-card {
@@ -24,20 +57,24 @@ h1 {
   box-shadow: 0 0 25px #00f7ff55;
 }
 
+#pairName {
+  color: #ffd000;
+}
+
 #signal {
   font-size: 42px;
 }
 
 .buy {
-  color: #00ff88;
+  color: #00ff88 !important;
 }
 
 .sell {
-  color: #ff3b3b;
+  color: #ff3b3b !important;
 }
 
 .wait {
-  color: #ffd000;
+  color: #ffd000 !important;
 }
 
 button {
@@ -60,4 +97,5 @@ button {
   margin-top: 20px;
   font-size: 14px;
   color: #aaa;
+  line-height: 1.6;
 }

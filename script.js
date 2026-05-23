@@ -2,7 +2,43 @@ let botInterval = null;
 let countdownInterval = null;
 let countdown = 60;
 
+const pairs = [
+  "EUR/USD", "GBP/USD", "USD/JPY", "USD/CHF",
+  "AUD/USD", "USD/CAD", "NZD/USD",
+  "EUR/GBP", "EUR/JPY", "GBP/JPY",
+  "AUD/JPY", "CAD/JPY", "CHF/JPY",
+  "EUR/AUD", "EUR/CAD", "GBP/AUD",
+  "GBP/CAD", "AUD/CAD", "AUD/NZD",
+  "NZD/JPY", "USD/TRY", "USD/BDT",
+  "BTC/USD", "ETH/USD", "XAU/USD"
+];
+
+function loadPairs() {
+  const select = document.getElementById("pairSelect");
+
+  pairs.forEach(pair => {
+    const option = document.createElement("option");
+    option.value = pair;
+    option.textContent = pair;
+    select.appendChild(option);
+  });
+
+  updatePairName();
+}
+
+function getSelectedPair() {
+  const pair = document.getElementById("pairSelect").value;
+  const otc = document.getElementById("otcMode").checked;
+
+  return otc ? `${pair} OTC` : pair;
+}
+
+function updatePairName() {
+  document.getElementById("pairName").innerText = getSelectedPair();
+}
+
 function speak(text) {
+  speechSynthesis.cancel();
   const msg = new SpeechSynthesisUtterance(text);
   msg.lang = "en-US";
   msg.rate = 0.9;
@@ -14,6 +50,7 @@ function randomMarketData() {
     trend: Math.random() > 0.5 ? "UP" : "DOWN",
     rsi: Math.floor(Math.random() * 100),
     candle: Math.floor(Math.random() * 100),
+    volatility: Math.floor(Math.random() * 100),
     fakeSignal: Math.random() < 0.25
   };
 }
@@ -44,8 +81,13 @@ function calculateSignal(data) {
   }
 
   if (data.candle > 65) {
-    score += 30;
+    score += 25;
     reasons.push("Strong candle");
+  }
+
+  if (data.volatility > 35 && data.volatility < 80) {
+    score += 20;
+    reasons.push("Good volatility");
   }
 
   if (data.fakeSignal) {
@@ -55,7 +97,7 @@ function calculateSignal(data) {
 
   score = Math.max(0, Math.min(score, 100));
 
-  if (score < 75) {
+  if (score < 78) {
     direction = "NO TRADE";
   }
 
@@ -71,15 +113,16 @@ function updateUI(result) {
   const confidence = document.getElementById("confidence");
   const reason = document.getElementById("reason");
   const log = document.getElementById("log");
+  const pair = getSelectedPair();
 
   signal.className = "";
 
   if (result.direction === "BUY") {
     signal.classList.add("buy");
-    speak("Buy signal detected. Expiry one minute.");
+    speak(`${pair}. Buy signal detected. Expiry one minute. Confidence ${result.score} percent.`);
   } else if (result.direction === "SELL") {
     signal.classList.add("sell");
-    speak("Sell signal detected. Expiry one minute.");
+    speak(`${pair}. Sell signal detected. Expiry one minute. Confidence ${result.score} percent.`);
   } else {
     signal.classList.add("wait");
   }
@@ -89,11 +132,12 @@ function updateUI(result) {
   reason.innerText = result.reason || "No clean setup";
 
   log.innerHTML =
-    `[${new Date().toLocaleTimeString()}] ${result.direction} - ${result.score}%<br>` +
+    `[${new Date().toLocaleTimeString()}] ${pair} → ${result.direction} - ${result.score}%<br>` +
     log.innerHTML;
 }
 
 function runBot() {
+  updatePairName();
   const data = randomMarketData();
   const result = calculateSignal(data);
   updateUI(result);
@@ -101,6 +145,8 @@ function runBot() {
 }
 
 function startTimer() {
+  clearInterval(countdownInterval);
+
   countdown = 60;
   document.getElementById("timer").innerText = countdown;
 
@@ -117,7 +163,7 @@ function startTimer() {
 function startBot() {
   if (botInterval) return;
 
-  speak("Voice signal app started.");
+  speak("Quantum voice signal app started.");
   runBot();
 
   botInterval = setInterval(runBot, 60000);
@@ -131,8 +177,15 @@ function stopBot() {
   botInterval = null;
   countdownInterval = null;
 
-  speak("Voice signal app stopped.");
+  speak("Quantum voice signal app stopped.");
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadPairs();
+
+  document.getElementById("pairSelect").addEventListener("change", updatePairName);
+  document.getElementById("otcMode").addEventListener("change", updatePairName);
+});
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js");
